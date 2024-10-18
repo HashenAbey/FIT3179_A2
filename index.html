@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Metadata for defining character encoding and responsive layout -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Title of the page displayed in the browser tab -->
+  <title>Australian Weather Data Visualization</title>
+
+  <!-- Importing necessary JavaScript libraries for Vega and Vega-Lite visualizations -->
+  <script src="https://cdn.jsdelivr.net/npm/vega@5.30.0"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vega-lite@5.20.1"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vega-embed@6.26.0"></script>
+
+  <!-- Styling for the webpage -->
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+      margin: 0;
+      background-color: #e0f7ff; /* Light blue background color */
+      color: #1d1d1f; /* Dark gray text color */
+    }
+
+    header {
+      text-align: center; 
+      padding: 45px;
+      background-color: #006DAE; /* Monash University blue */
+      color: white; 
+    }
+
+    header h1 {
+      font-size: 3rem;  /* Header Size and Weight */
+      font-weight: 700; 
+    }
+
+    /* Flexbox container for layout of sections */
+    .flex-container {
+      display: flex;
+      justify-content: space-between; /* Evenly distributes space between child elements */
+      align-items: stretch;
+      max-width: 1300px;
+      margin: 40px auto; /* Adds vertical margin */
+      gap: 20px; /* Adds space between flex containers */
+    }
+
+    /* Styling for left and right containers */
+    .left-container, .right-container {
+      flex: 1; 
+      background-color: white; 
+      border-radius: 15px; /* Rounding */
+      padding: 30px; 
+      box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1); /* Adds shadow effect */
+      display: flex;
+      flex-direction: column; 
+      justify-content: center;
+      transition: all 0.3s ease; /* Smooth transition effect */
+    }
+
+    /* Hover effect for the containers */
+    .left-container:hover, .right-container:hover {
+      transform: translateY(-5px); /* Moves the container up */
+      box-shadow: 0 15px 25px rgba(0, 0, 0, 0.15); /* Increases shadow intensity */
+    }
+
+    /* Chart container styling */
+    .chart-container {
+      width: 100%; 
+      height: auto;
+      padding: 0;
+      display: flex; /* Flexbox layout for center alignment */
+      justify-content: center;
+      align-items: center;
+      box-sizing: border-box; /* Ensures padding is included within width/height */
+    }
+
+    h2 {
+      font-size: 2rem; /* Medium-sized heading */
+      margin-bottom: 20px;
+    }
+    
+    footer {
+      text-align: center;
+      padding: 20px;
+      background-color: #006DAE; /* Monash University blue */
+      color: white; /* White text */
+      margin-top: 40px; /* Adds margin to the top of the footer */
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Main header section -->
+  <header>
+    <h1>Australian Weather Data Across Key Cities</h1>
+    <p>Interactive visualizations exploring rainfall, temperature, and climate patterns across Australia.</p>
+  </header>
+
+  <!-- Section for the interactive weather data map -->
+  <div class="flex-container">
+    <div class="left-container">
+      <h2>Interactive Weather Data Map</h2>
+      <p>This map shows weather data across Australia, with circle size indicating rainfall and color indicating maximum temperatures. 
+        Use the filters to explore data for different conditions.</p>
+      
+        <p>Sydney experiences an average maximum temperature of 23.7°C, with the highest recorded temperature reaching 40.9°C. 
+          The city also sees varied rainfall, with the maximum recorded at 119.4mm in a single day. In contrast, Darwin experiences extreme rainfall, 
+          particularly during the monsoon season, with a maximum rainfall of 210.6mm recorded in a day.</p>
+    </div>
+    <div class="right-container">
+      <!-- Container for embedding the Vega-Lite visualization -->
+      <div id="map-chart" class="chart-container"></div>
+    </div>
+  </div>
+
+  <!-- Section for wind patterns visualization -->
+  <div class="flex-container">
+    <div class="left-container">
+      <h2>Wind Patterns Across Cities</h2>
+      <p>This wind rose chart shows the distribution of wind directions and speeds for selected Australian cities. The length of each "petal" represents the frequency of wind from that direction, while the color indicates wind speed. 
+        Use the dropdown to select different cities. </p>
+
+        <p>In Sydney, the most frequent wind direction is from the west (W), with gusts reaching up to 96 km/h. Melbourne experiences predominant winds from the north (N), with powerful gusts reaching up to 122 km/h. In Brisbane, the most frequent winds blow from the east (E), with gusts reaching a maximum speed of 76 km/h.</p>
+    </div>
+    <div class="right-container">
+      <!-- Container for embedding the wind rose chart -->
+      <div id="wind-rose-chart" class="chart-container"></div>
+    </div>
+  </div>
+
+  <!-- Section for temperature range and sunshine comparison -->
+  <div class="flex-container">
+    <div class="left-container">
+      <h2>Temperature Range and Sunshine Across Cities</h2>
+      <p>This chart compares the temperature range (difference between max and min temperatures) and sunshine hours for different Australian cities. The height of each bar represents the temperature range, while the color intensity indicates the amount of sunshine. Use the slider to filter data based on wind speed.</p>
+      
+      <p>Among the Major Cities, Perth leads in sunshine hours, averaging 8.78 hours daily, followed closely by Darwin with 8.57 hours. Melbourne experiences fewer sunshine hours, averaging 6.44 hours per day.</p>
+    </div>
+    <div class="right-container">
+      <!-- Container for embedding the temperature and sunshine comparison chart -->
+      <div id="temp-sunshine-chart" class="chart-container"></div>
+    </div>
+  </div>
+
+  <!-- Section for weather pattern calendar visualization -->
+  <div class="flex-container">
+    <div class="left-container">
+      <h2>Weather Pattern Calendar</h2>
+      <p>This calendar heatmap visualizes the maximum temperature patterns throughout the year for selected cities. 
+        Each cell represents a day, with color intensity indicating the maximum temperature. Use the dropdown to choose a city and explore its yearly temperature trends.</p>
+      
+        <p>Sydney’s maximum temperature peaks at 40.9°C. Melbourne, on the other hand, is known for its more unpredictable climate, with rapid changes between cooler and warmer days. Melbourne’s maximum temperature can spike to 39.4°C, even during periods of mild weather.</p>
+    </div>
+    <div class="right-container">
+      <!-- Container for embedding the weather pattern calendar -->
+      <div id="weather-calendar" class="chart-container"></div>
+    </div>
+  </div>
+
+  <!-- Footer section -->
+  <footer>
+    <p>&copy;2024 Australian Weather Data Across Key Cities by Hashen Abeygunawardana.</p>
+    <p>Data was sourced from the Australian Bureau of Meteorology, Downloaded from Kaggle - "Rain in Australia" by Joe Young.</p>
+  </footer>
+
+  <!-- Vega-Lite Specifications for Visualizations -->
+  <script>
+    // Vega-Lite specification for the Interactive Map Visualization
+    const mapSpec = {
+      "$schema": "https://vega.github.io/schema/vega-lite/v5.json", 
+      "width": 800,
+      "height": 500,
+      "projection": { 
+        "type": "mercator", 
+        "center": [133.7751, -28.2744], // Centering the map on Australia
+        "scale": 750 // Adjusts zoom level
+      },
+      "layer": [ 
+        // Graticule settings
+        {
+          "data": {"graticule": true},
+          "mark": {"type": "geoshape", "fill": null, "stroke": "lightgray"} 
+        },
+        // Australia states boundary layer 
+        {
+          "data": {
+            "url": "https://raw.githubusercontent.com/tonywr71/GeoJson-Data/master/australian-states.json",
+            "format": {"type": "topojson", "feature": "australian-states"}
+          },
+          "mark": {"type": "geoshape", "fill": "#fffff0", "stroke": "black", "strokeWidth": 0.4}
+        },
+        // Weather data points viz 
+        {
+          "data": {
+            "url": "https://raw.githubusercontent.com/HashenAbey/FIT3179_A2/refs/heads/main/Cleaned_Weather_Data_from_2015.csv" 
+          },
+          "transform": [ 
+            {"filter": "datum.Rainfall >= minRainfall && datum.Rainfall <= maxRainfall"}, // Filter rainfall 
+            {"filter": "datum.MaxTemp >= minTemp && datum.MaxTemp <= maxTemp"} // Filter temperature 
+          ],
+          "encoding": {
+            "longitude": {"field": "Longitude", "type": "quantitative"}, // Longitude for map plotting
+            "latitude": {"field": "Latitude", "type": "quantitative"}, // Latitude for map plotting
+            "size": {
+              "field": "Rainfall", 
+              "type": "quantitative",
+              "scale": {"domain": [0, 211], "range": [20, 500]} // Circle size based on rainfall amount
+            },
+            "color": {
+              "field": "MaxTemp", 
+              "type": "quantitative",
+              "scale": {"scheme": "blues"} // Blue Color scheme based on maximum temperature
+            },
+            "tooltip": [ // Tooltip 
+              {"field": "Location", "type": "nominal"},
+              {"field": "Date", "type": "temporal"},
+              {"field": "MaxTemp", "type": "quantitative", "format": ".1f"},
+              {"field": "Rainfall", "type": "quantitative", "format": ".1f"}
+            ]
+          },
+          "mark": {"type": "circle", "opacity": 0.8} // Data point viz as circles
+        }
+      ],
+      // Parameters for filters
+      "params": [
+        {
+          "name": "minRainfall",
+          "value": 0,
+          "bind": {"input": "range", "min": 0, "max": 50, "step": 1, "name": "Min Rainfall"}
+        },
+        {
+          "name": "maxRainfall",
+          "value": 50,
+          "bind": {"input": "range", "min": 0, "max": 211, "step": 1, "name": "Max Rainfall"}
+        },
+        {
+          "name": "minTemp",
+          "value": 0,
+          "bind": {"input": "range", "min": -5, "max": 50, "step": 1, "name": "Min Temperature"}
+        },
+        {
+          "name": "maxTemp",
+          "value": 50,
+          "bind": {"input": "range", "min": -5, "max": 50, "step": 1, "name": "Max Temperature"}
+        }
+      ],
+      "config": {
+        "view": {"stroke": null}, // Removes stroke around the view
+        "background": "#cce5ff" // Light blue background for the visualization
+      }
+    };
+    vegaEmbed("#map-chart", mapSpec, {mode: "vega-lite"});
+
+    // Wind Patterns Chart
+    const windRoseChartSpec = {
+      "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+      "width": 400,
+      "height": 400,
+      "data": {
+        "url": "https://raw.githubusercontent.com/HashenAbey/FIT3179_A2/refs/heads/main/Cleaned_Weather_Data_from_2015.csv"
+      },
+      "transform": [
+        {"filter": "datum.Location == selectedCity"},
+        {"filter": "datum.WindGustDir != null && datum.WindGustSpeed != null"},
+        {
+          "aggregate": [{"op": "count", "as": "frequency"}],
+          "groupby": ["WindGustDir", "WindGustSpeed"]
+        },
+        {
+          "calculate": "datum.WindGustSpeed < 20 ? 'Low' : datum.WindGustSpeed < 40 ? 'Medium' : 'High'",
+          "as": "WindSpeedCategory"
+        }
+      ],
+      "layer": [{
+        "mark": {"type": "arc", "innerRadius": 20, "stroke": "#fff"},
+        "encoding": {
+          "theta": {"field": "WindGustDir", "type": "nominal", "sort": null},
+          "radius": {"field": "frequency", "type": "quantitative", "scale": {"type": "sqrt"}},
+          "color": {
+            "field": "WindSpeedCategory",
+            "type": "ordinal",
+            "scale": {
+              "domain": ["Low", "Medium", "High"],
+              "range": ["#deebf7", "#9ecae1", "#3182bd"]
+            },
+            "title": "Wind Speed"
+          },
+          "tooltip": [
+            {"field": "WindGustDir", "type": "nominal", "title": "Direction"},
+            {"field": "WindSpeedCategory", "type": "nominal", "title": "Wind Speed"},
+            {"field": "frequency", "type": "quantitative", "title": "Frequency"}
+          ]
+        }
+      }],
+      "view": {"stroke": null},
+      "params": [{
+        "name": "selectedCity",
+        "value": "Sydney",
+        "bind": {
+          "input": "select",
+          "options": ["Adelaide", "Brisbane", "Canberra", "Darwin", "Hobart", "Melbourne", "Perth", "Sydney"],
+          "labels": ["Adelaide", "Brisbane", "Canberra", "Darwin", "Hobart", "Melbourne", "Perth", "Sydney"],
+          "name": "Select City: "
+        }
+      }]
+    };
+    vegaEmbed("#wind-rose-chart", windRoseChartSpec, {mode: "vega-lite"})
+
+    // Vega-Lite specification for the Temperature Range and Sunshine Chart
+    const tempSunshineChartSpec = {
+      "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+      "width": 600,
+      "height": 400,
+      "data": {
+        "url": "https://raw.githubusercontent.com/HashenAbey/FIT3179_A2/refs/heads/main/Cleaned_Weather_Data_from_2015.csv" // Weather data URL
+      },
+      "params": [
+        {
+          "name": "windSpeedThreshold",
+          "value": 0,
+          "bind": {
+            "input": "range",
+            "min": 0,
+            "max": 100,
+            "step": 5,
+            "name": "Minimum Wind Speed (km/h): " // Allows filtering based on wind speed
+          }
+        }
+      ],
+      "transform": [
+        {"filter": "datum.WindGustSpeed >= windSpeedThreshold"}, // Filters data based on wind speed threshold
+        {
+          "aggregate": [
+            {"op": "mean", "field": "MaxTemp", "as": "AvgMaxTemp"},
+            {"op": "mean", "field": "MinTemp", "as": "AvgMinTemp"},
+            {"op": "mean", "field": "Sunshine", "as": "AvgSunshine"},
+            {"op": "mean", "field": "WindGustSpeed", "as": "AvgWindSpeed"}
+          ],
+          "groupby": ["Location"] // Groups data by city location
+        },
+        {
+          "calculate": "datum.AvgMaxTemp - datum.AvgMinTemp", // Calculates temperature range
+          "as": "TempRange"
+        }
+      ],
+      "mark": "bar", // Bar chart to display temperature range
+      "encoding": {
+        "x": {"field": "Location", "type": "nominal", "title": "City"},
+        "y": {
+          "field": "TempRange",
+          "type": "quantitative",
+          "title": "Temperature Range (°C)"
+        },
+        "color": {
+          "field": "AvgSunshine",
+          "type": "quantitative",
+          "title": "Average Sunshine (hours)",
+          "scale": {"scheme": "blues"}
+        },
+        "tooltip": [
+          {"field": "Location", "type": "nominal", "title": "City"},
+          {"field": "AvgMaxTemp", "type": "quantitative", "title": "Avg Max Temp (°C)", "format": ".1f"},
+          {"field": "AvgMinTemp", "type": "quantitative", "title": "Avg Min Temp (°C)", "format": ".1f"},
+          {"field": "TempRange", "type": "quantitative", "title": "Temp Range (°C)", "format": ".1f"},
+          {"field": "AvgSunshine", "type": "quantitative", "title": "Avg Sunshine (hours)", "format": ".1f"},
+          {"field": "AvgWindSpeed", "type": "quantitative", "title": "Avg Wind Speed (km/h)", "format": ".1f"}
+        ]
+      },
+      "config": {
+        "view": {"stroke": null}, // Removes stroke around the view
+        "axis": {"labelAngle": 45} // Tilts axis labels for better readability
+      }
+    };
+
+    vegaEmbed("#temp-sunshine-chart", tempSunshineChartSpec, {mode: "vega-lite"})
+
+    // Vega-Lite specification for the Weather Pattern Calendar
+    const weatherCalendarSpec = {
+      "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+      "width": 500,
+      "height": 300,
+      "title": "Weather Pattern Calendar",
+      "data": {
+        "url": "https://raw.githubusercontent.com/HashenAbey/FIT3179_A2/refs/heads/main/Cleaned_Weather_Data_from_2015.csv"
+      },
+      "transform": [
+        {"filter": "datum.Location == selectedCity"}, // Filters for major cities
+        {"filter": "year(datum.Date) == selectedYear"}, // Filter for Year
+        {"timeUnit": "yearmonthdate", "field": "Date", "as": "date"}, // Extracts year, month, and date from the date field
+        {"timeUnit": "month", "field": "Date", "as": "month"}, // Extracts month for y-axis
+        {"timeUnit": "date", "field": "Date", "as": "day"} // Extracts day for x-axis
+      ],
+      "encoding": {
+        "x": {
+          "field": "date",
+          "timeUnit": "date",
+          "type": "ordinal",
+          "title": "Day",
+          "axis": {"labelAngle": 0, "format": "%e"} // X-axis for day
+        },
+        "y": {
+          "field": "month",
+          "timeUnit": "month",
+          "type": "ordinal",
+          "title": "Month",
+          "sort": "ascending" // Y-axis for month
+        }
+      },
+      "layer": [
+        {
+          "mark": "rect",
+          "encoding": {
+            "color": {
+              "field": "MaxTemp",
+              "type": "quantitative",
+              "scale": {
+                "scheme": "blues",
+                "domain": [-10, 50]
+              },
+              "legend": {"title": "Max Temperature (°C)"}
+            },
+            "tooltip": [
+              {"field": "Date", "type": "temporal", "title": "Date", "format": "%B %d, %Y"},
+              {"field": "MaxTemp", "type": "quantitative", "title": "Max Temperature (°C)", "format": ".1f"},
+              {"field": "Rainfall", "type": "quantitative", "title": "Rainfall (mm)", "format": ".1f"}
+            ]
+          }
+        }
+      ],
+      "config": {
+        "view": {"strokeWidth": 0},
+        "axis": {"domain": false}
+      },
+      "params": [{
+        "name": "selectedCity",
+        "value": "Sydney",
+        "bind": {
+          "input": "select",
+          "options": ["Adelaide", "Brisbane", "Canberra", "Darwin", "Hobart", "Melbourne", "Perth", "Sydney"],
+          "labels": ["Adelaide", "Brisbane", "Canberra", "Darwin", "Hobart", "Melbourne", "Perth", "Sydney"],
+          "name": "Select City: "
+        }
+      },
+      {
+      "name": "selectedYear",
+      "value": 2015,
+      "bind": {
+        "input": "select",
+        "options": [2015, 2016, 2017],
+        "name": "Select Year: "
+  }
+}
+    ]
+    };
+    vegaEmbed("#weather-calendar", weatherCalendarSpec, {mode: "vega-lite"});
+  </script>
+
+</body>
+</html>
